@@ -11,7 +11,7 @@
 #define pre_connect 0
 
 #define BUF_SIZE 4096
-#define MAX_THREAD 2048
+#define MAX_THREAD 100000
 struct timespec diff_timespec(struct timespec start, struct timespec end);
 long long nanosec_elapsed(struct timespec diff);
 void *client_thread(void *data);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	diff = diff_timespec(start, end);
 	//printf("%lld nanoseconds \n", nanosec_elapsed(diff)/100000000);
 	printf("time clock start: %d, end: %d, result: %.3f \n", start, end, res);
-	printf("%lld nanoseconds \n", 10000000000/nanosec_elapsed(diff));
+	printf("%lld nanoseconds \n", (double)nanosec_elapsed(diff));
 	
 /*
 	for (i = 0 ; i < th_count ; i++)
@@ -158,7 +158,7 @@ void *client_thread(void *data)
 	int i;
 	int a = *(int *)data;
 
-	printf("client_thread number: %d \n", a);
+	//printf("client_thread number: %d \n", a);
 
 	return (void *)(i * 100);
 }

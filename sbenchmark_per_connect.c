@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <time.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -16,9 +17,10 @@ void error_handling(char *msg);
 
 int main(int argc, char *argv[])
 {
-	int sock, i, str_len, status, th_count;
+	int sock, i, str_len, th_count;
 	char message[BUF_SIZE];
 	pthread_t *cthread[MAX_THREAD];	
+	float status, total_t = 0;	
 
 	printf("argc: %d \n", argc);
 	for(i=0;i<argc;i++)
@@ -35,12 +37,19 @@ int main(int argc, char *argv[])
 			error_handling("thread create error");
 	}
 
+	//for (i = th_count ; i >= 0 ; i--)
 	for (i = 0 ; i < th_count ; i++)
 	{
-		pthread_join(cthread[i], (void **)&status);
-		//printf("%d count Thread End: %d \n", i, status);
+		if (-1 == (pthread_join(cthread[i], (void **)&status)))
+			error_handling("join() error");
+		total_t += status;
+		printf("%d count Thread End: %d \n", i, status);
 	}
+	sleep(5);
 
+	puts("!!!!!!!!!!!!!");
+
+	printf("total_t: %f \n", total_t);
 	/*
 	if (!strcmp(argv[1], "--h"))
 	{
@@ -87,9 +96,12 @@ sbenchmark help command is \"--h\" \n");
 void *client_thread(void *data)
 {
 	int i, sock;
-	int a = *(int *)data;
+	float gap; 
 	struct sockaddr_in serv_adr;
-	
+	time_t start_t, end_t;	
+
+	start_t = clock();
+
 	if (-1 == (sock = socket(PF_INET, SOCK_STREAM, 0)))
 		error_handling("socket() error");
 	
@@ -103,11 +115,13 @@ void *client_thread(void *data)
 		error_handling("connect() error");
 	else
 		printf("connected... %d \n", sock);
-
-	printf("client_thread number: %d \n", a);
-
+	
 	close(sock);
-	return (void *)(i * 100);
+
+	end_t = clock();
+	gap = (float)(end_t - start_t)/(CLOCKS_PER_SEC);
+
+	pthread_exit((void *)0);
 }
 
 void error_handling(char *msg)
