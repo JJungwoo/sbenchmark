@@ -97,9 +97,9 @@ int main(int argc, char *argv[])
 		{
 			printf("%d ISSET !\n", clnt_sock);
 		}*/
-		printf("%d ISSET !\n", clnt_sock);
-		print_fd(fst);
-		puts("?\n");
+		//printf("%d ISSET !\n", clnt_sock);
+		//print_fd(fst);
+		//puts("?\n");
 	}
 
 

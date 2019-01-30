@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 				event.events = EPOLLIN;
 				event.data.fd = clnt_sock;
 				epoll_ctl(epfd, EPOLL_CTL_ADD, clnt_sock, &event);
-				printf("connected client: %d\n", clnt_sock);
+				//printf("connected client: %d\n", clnt_sock);
 			}	
 		}
 	}

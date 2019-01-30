@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #define pre_connect 0
-#define JDBG 
+//#define JDBG 
 
 #define MTX_ON 0
 
@@ -30,6 +30,8 @@ long print_time(struct timeval T1, struct timeval T2);
 pthread_spinlock_t spinlock;
 pthread_mutex_t mutex;
 
+int count;
+
 int main(int argc, char *argv[])
 {
 	int sock, i, str_len, th_count;
@@ -49,41 +51,25 @@ int main(int argc, char *argv[])
 		printf("argv[%d]: %s \n ", i, argv[i]);
 #endif
 	
-	memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family = AF_INET;
-	serv_adr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	serv_adr.sin_port = htons(atoi("3389"));
-
 	th_count = atoi(argv[2]);
 	
 	gettimeofday(&T1, NULL);
+
 
 	for (i = 0 ; i < th_count ; i++)
 	{
 #ifdef JDBG
 		printf("%d count th \n", i);
 #endif
-#ifdef MUTEX
-		pthread_mutex_lock(&mutex);
-#else
-		pthread_spin_lock(&spinlock);
-#endif
-		if (0 > pthread_create(&cthread[i], NULL, client_thread, (void *)&serv_adr))
+		if (0 > pthread_create(&cthread[i], NULL, client_thread, NULL))
 			error_handling("thread create error");
-#ifdef MUTEX
-		pthread_mutex_unlock(&mutex);
-#else
-		pthread_spin_unlock(&spinlock);
-#endif
 	}
+	while(count != th_count)
+		printf("!!!! %d \n", count);
 
+/*
 	for (i = 0 ; i < th_count ; i++)
 	{
-#ifdef MUTEX
-		pthread_mutex_lock(&mutex);
-#else
-		pthread_spin_lock(&spinlock);
-#endif
 		if (-1 == pthread_join(cthread[i], &thread_res))
 			error_handling("join() error");
 #ifdef JDBG
@@ -92,57 +78,20 @@ int main(int argc, char *argv[])
 #endif
 		total_t += thread_res;
 
-#ifdef MUTEX
-		pthread_mutex_unlock(&mutex);
-#else
-		pthread_spin_unlock(&spinlock);
-#endif
 	}
+*/
 
 	gettimeofday(&T2, NULL);
 
 	time_res = print_time(T1, T2);
 	puts("-----------");
+#ifdef MUTEX
+	puts("mutex");
+#else
+	puts("spinlock");
+#endif	
 	printf("real time res: %ld total_t: %ld \n", time_res, total_t);
-	/*
-	if (!strcmp(argv[1], "--h"))
-	{
-		puts("nono");
-		puts("sbenchmark is server test benchmark");
-		puts("./sbenchmark <ip> <port> -t 5 ");
-	} 
-
-	if (5 > argc) {
-		error_handling("input value is bad command line format \n \
-sbenchmark help command is \"--h\" \n");
-		exit(1);
-	}
-	else
-	{
-		if (-1 == (sock = socket(PF_INET, SOCK_STREAM, 0)))
-			error_handling("socket() error");
-	
-		memset(&serv_adr, 0, sizeof(serv_adr));
-		serv_adr.sin_family = AF_INET;
-		serv_adr.sin_addr.s_addr = inet_addr(argv[1]);
-		serv_adr.sin_port = htons(atoi(argv[2]));
-
-		if (!strcmp(argv[3], "-p"))
-		{	
-			if (0 < argv[4])	// thread counter error check
-			{
-								
-			}
-			else
-				error_handling("thread counter error");
-		
-#if pre_connect
-			if (-1 == connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr)))
-#endif
-		}
-
-	}
-	*/
+	printf("count : %d \n", count);
 
 	pthread_spin_destroy(&spinlock);
 	pthread_mutex_destroy(&mutex);
@@ -152,40 +101,19 @@ sbenchmark help command is \"--h\" \n");
 
 void *client_thread(void *data)
 {
-	int i, sock;
-	long gap; 
-	struct sockaddr_in serv_adr;
-	struct timeval T1, T2;
-
-	gettimeofday(&T1, NULL);
-
-	if (-1 == (sock = socket(PF_INET, SOCK_STREAM, 0)))
-		error_handling("socket() error");
-	
-	/*memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family = AF_INET;
-	serv_adr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	serv_adr.sin_port = htons(atoi("3389"));*/
-
-	serv_adr = *((struct sockaddr_in*)data);
-	
-	if (-1 == connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr)))
-		error_handling("connect() error");
-#ifdef JDBG
-	else
-		printf("connected... %d \n", sock);
-#endif
-	
-	close(sock);
-	
-	gettimeofday(&T2, NULL);
-
-	gap = print_time(T1, T2);
-#ifdef JDBG
-	printf("gap: %ld\n", gap);
+#ifdef MUTEX
+	pthread_mutex_lock(&mutex);
+#else
+	pthread_spin_lock(&spinlock);
+#endif	
+	count += 1;	
+#ifdef MUTEX
+	pthread_mutex_unlock(&mutex);
+#else
+	pthread_spin_unlock(&spinlock);
 #endif
 
-	return (void*)gap;
+	return (void*) 0;
 }
 
 long print_time(struct timeval T1, struct timeval T2)
