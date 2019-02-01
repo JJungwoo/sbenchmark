@@ -13,7 +13,8 @@ struct timespec diff_timespec(struct timespec start, struct timespec end);
 long long nanosec_elapsed(struct timespec diff);
  
 // change this to make the run time short or longer
-#define WORK_PER_TEST 500000
+#define WORK_PER_TEST 5000000
+//#define WORK_PER_TEST 500000000
  
 // global variable will be incremented from many threads
 unsigned long counter = 0;
@@ -25,7 +26,6 @@ typedef void* thread_func_t(void*);
 static sem_t sem_one;
 
 void* normal(void *arg){
-	
 	int i;
 	for (i = 0 ; i < WORK_PER_TEST; ++i) {
 		counter++;
@@ -34,7 +34,6 @@ void* normal(void *arg){
 } 
 
 void* CAS(void *arg){
-	
 	int i, temp;
 	for (i = 0; i < WORK_PER_TEST; ++i) {
 		temp = counter;
@@ -44,11 +43,10 @@ void* CAS(void *arg){
 			i--;
 		}	
 	}
-	printf("CAS : %d \n", counter);
+	//printf("CAS : %d \n", counter);
 }
 
 void* semaphore(void *arg){
-	
 	int i;
 	for (i = 0; i < WORK_PER_TEST; ++i) {
 		sem_wait(&sem_one);
@@ -59,7 +57,6 @@ void* semaphore(void *arg){
 }
 
 void* atomic(void* arg){
- 
     int i;
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         __sync_fetch_and_add( &counter, 1 );
@@ -68,7 +65,6 @@ void* atomic(void* arg){
 }
  
 void* mutexfunc(void* arg){
- 
     int i;
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_mutex_lock(&mutex);
@@ -78,7 +74,6 @@ void* mutexfunc(void* arg){
 }
  
 void* spin(void* arg){
- 
     int i;
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_spin_lock(&spinlock);
@@ -88,7 +83,6 @@ void* spin(void* arg){
 }
  
 void* read_lock(void* arg){
- 
     int i;
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_rwlock_rdlock(&rwlock);
@@ -98,7 +92,6 @@ void* read_lock(void* arg){
 }
  
 void* write_lock(void* arg){
- 
     int i;
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_rwlock_wrlock(&rwlock);
@@ -108,7 +101,6 @@ void* write_lock(void* arg){
 }
  
 void do_test(thread_func_t func, unsigned short threads, const char* name){
- 
     int i;
     struct timespec start;
     struct timespec end;
@@ -129,7 +121,7 @@ void do_test(thread_func_t func, unsigned short threads, const char* name){
     for (i = 0; i < threads; i++)
         pthread_join( thread_array[i], NULL );
  
-	printf("%s counter = %lu \n ", name, counter);
+	//printf("%s counter = %lu \n ", name, counter);
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     diff = diff_timespec(start, end);
@@ -139,14 +131,14 @@ void do_test(thread_func_t func, unsigned short threads, const char* name){
 void do_all_tests(int threads){
     printf("*************************************\n");
     fflush(stdout);
-	do_test(&normal, threads, "normal");
-	do_test(&CAS, threads, "CompareAndSet");
-    do_test(&atomic, threads, "atomic");
+	//do_test(&normal, threads, "normal");
+	//do_test(&CAS, threads, "CompareAndSet");
+    //do_test(&atomic, threads, "atomic");
     do_test(&mutexfunc, threads, "mutex");
-	do_test(&semaphore, threads, "semaphore");
-    do_test(&spin, threads, "spin");
-    do_test(&read_lock, threads, "read_lock");
-    do_test(&write_lock, threads, "write_lock");
+	//do_test(&semaphore, threads, "semaphore");
+    //do_test(&spin, threads, "spin");
+    //do_test(&read_lock, threads, "read_lock");
+    //do_test(&write_lock, threads, "write_lock");
     printf("*************************************\n");
     fflush(stdout);
 }
@@ -158,9 +150,11 @@ int main(int argc, char** argv)
     pthread_spin_init(&spinlock, 0);
 	sem_init(&sem_one, 0, 1);
  
-    //do_all_tests(1);
-    //do_all_tests(8);
+    //do_all_tests(2);
+    //do_all_tests(4);
     do_all_tests(32); // spin lock will take forever if the number of threads is much higher
+    //do_all_tests(50); // spin lock will take forever if the number of threads is much higher
+    //do_all_tests(1000); // spin lock will take forever if the number of threads is much higher
  
     pthread_mutex_destroy(&mutex);
     pthread_rwlock_destroy(&rwlock);

@@ -80,12 +80,12 @@ int main(int argc, char *argv[])
 			if (-1 == (clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_len)))
 				error_handling("accept() error");
 		}
-
+		printf("client socket fd: %d \n", clnt_sock);
 		FD_SET(clnt_sock, &fst);
 		
 		//if (clnt_sock > clnt_max)
 		//	clnt_max = clnt_sock;
-		/*for (i = 0 ; i < clnt_max+1; i++)
+		for (i = 0 ; i < clnt_max+1; i++)
 		{
 			puts("accept() overhead..\n");
 			if (-1 == (clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &clnt_len)))
@@ -93,11 +93,11 @@ int main(int argc, char *argv[])
 			FD_SET(clnt_sock, &fst);
 			printf("%d connected!\n", clnt_sock);
 		}
-		if (1 == FD_ISSET(clnt_sock, &fst))
+		/*if (1 == FD_ISSET(clnt_sock, &fst))
 		{
 			printf("%d ISSET !\n", clnt_sock);
 		}*/
-		//printf("%d ISSET !\n", clnt_sock);
+		printf("%d ISSET !\n", clnt_sock);
 		//print_fd(fst);
 		//puts("?\n");
 	}

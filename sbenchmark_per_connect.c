@@ -8,12 +8,10 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 
-#define pre_connect 0
-#define JDBG 
+//#define pre_connect 0
+//#define JDBG 
 
-#define MTX_ON 0
-
-#if MTX_ON
+#ifdef MUTEX
 	#define MUTEX
 #else
 	#define SPINLOCK
@@ -22,13 +20,15 @@
 #define BUF_SIZE 1024
 #define MAX_THREAD 100000
 
-
 void *client_thread(void *data);
 void error_handling(char *msg);
 long print_time(struct timeval T1, struct timeval T2);
 
-pthread_spinlock_t spinlock;
+#ifdef MUTEX
 pthread_mutex_t mutex;
+#else
+pthread_spinlock_t spinlock;
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -103,6 +103,11 @@ int main(int argc, char *argv[])
 
 	time_res = print_time(T1, T2);
 	puts("-----------");
+#ifdef MUTEX
+	puts("mutex");
+#else
+	puts("spinlock");
+#endif
 	printf("real time res: %ld total_t: %ld \n", time_res, total_t);
 	/*
 	if (!strcmp(argv[1], "--h"))
@@ -144,9 +149,11 @@ sbenchmark help command is \"--h\" \n");
 	}
 	*/
 
-	pthread_spin_destroy(&spinlock);
+#ifdef MUTEX
 	pthread_mutex_destroy(&mutex);
-
+#else
+	pthread_spin_destroy(&spinlock);
+#endif
 	return 0;
 }
 
@@ -155,18 +162,13 @@ void *client_thread(void *data)
 	int i, sock;
 	long gap; 
 	struct sockaddr_in serv_adr;
-	struct timeval T1, T2;
+	struct timespec start_ts, end_ts;
 
-	gettimeofday(&T1, NULL);
+	clock_gettime(CLOCK_REALTIME, &start_ts);
 
 	if (-1 == (sock = socket(PF_INET, SOCK_STREAM, 0)))
 		error_handling("socket() error");
 	
-	/*memset(&serv_adr, 0, sizeof(serv_adr));
-	serv_adr.sin_family = AF_INET;
-	serv_adr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	serv_adr.sin_port = htons(atoi("3389"));*/
-
 	serv_adr = *((struct sockaddr_in*)data);
 	
 	if (-1 == connect(sock, (struct sockaddr*)&serv_adr, sizeof(serv_adr)))
@@ -177,10 +179,10 @@ void *client_thread(void *data)
 #endif
 	
 	close(sock);
-	
-	gettimeofday(&T2, NULL);
 
-	gap = print_time(T1, T2);
+	clock_gettime(CLOCK_REALTIME, &end_ts);	
+
+	gap = print_time(start_ts, end_ts);
 #ifdef JDBG
 	printf("gap: %ld\n", gap);
 #endif
@@ -188,7 +190,7 @@ void *client_thread(void *data)
 	return (void*)gap;
 }
 
-long print_time(struct timeval T1, struct timeval T2)
+long long print_time(struct timespec T1, struct timepec T2)
 {
 	long sec, usec;
 	double time;
@@ -200,7 +202,7 @@ long print_time(struct timeval T1, struct timeval T2)
 	printf("print_time: \n T1: %ld, T2: %ld \n", T1.tv_sec, T2.tv_sec);
 #endif
 
-	if (T1.tv_usec > T2.tv_usec)
+	if (T1.tv_nsec > T2.tv_nsec)
 	{
 		sec = T2.tv_sec - T1.tv_sec - 1;
 		usec = 1000000 + T2.tv_usec - T1.tv_usec;

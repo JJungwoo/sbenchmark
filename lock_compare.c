@@ -11,7 +11,7 @@
 #define pre_connect 0
 //#define JDBG 
 
-#define MTX_ON 0
+#define MTX_ON 1
 
 #if MTX_ON
 	#define MUTEX
@@ -56,6 +56,11 @@ int main(int argc, char *argv[])
 	gettimeofday(&T1, NULL);
 
 
+#ifdef MUTEX
+	pthread_mutex_lock(&mutex);
+#else
+	pthread_spin_lock(&spinlock);
+#endif	
 	for (i = 0 ; i < th_count ; i++)
 	{
 #ifdef JDBG
@@ -64,6 +69,11 @@ int main(int argc, char *argv[])
 		if (0 > pthread_create(&cthread[i], NULL, client_thread, NULL))
 			error_handling("thread create error");
 	}
+#ifdef MUTEX
+	pthread_mutex_unlock(&mutex);
+#else
+	pthread_spin_unlock(&spinlock);
+#endif
 	while(count != th_count)
 		printf("!!!! %d \n", count);
 
