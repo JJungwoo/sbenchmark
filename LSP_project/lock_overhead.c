@@ -13,8 +13,8 @@ struct timespec diff_timespec(struct timespec start, struct timespec end);
 long long nanosec_elapsed(struct timespec diff);
  
 // change this to make the run time short or longer
-#define WORK_PER_TEST 5000000
-//#define WORK_PER_TEST 500000000
+//#define WORK_PER_TEST 5000000
+#define WORK_PER_TEST 500000000
  
 // global variable will be incremented from many threads
 unsigned long counter = 0;
@@ -134,8 +134,8 @@ void do_all_tests(int threads){
 	//do_test(&normal, threads, "normal");
 	//do_test(&CAS, threads, "CompareAndSet");
     //do_test(&atomic, threads, "atomic");
-    do_test(&mutexfunc, threads, "mutex");
-	//do_test(&semaphore, threads, "semaphore");
+    //do_test(&mutexfunc, threads, "mutex");
+	do_test(&semaphore, threads, "semaphore");
     //do_test(&spin, threads, "spin");
     //do_test(&read_lock, threads, "read_lock");
     //do_test(&write_lock, threads, "write_lock");
@@ -150,9 +150,9 @@ int main(int argc, char** argv)
     pthread_spin_init(&spinlock, 0);
 	sem_init(&sem_one, 0, 1);
  
-    //do_all_tests(2);
-    //do_all_tests(4);
-    do_all_tests(32); // spin lock will take forever if the number of threads is much higher
+    do_all_tests(2);
+    //do_all_tests(8);
+    //do_all_tests(32); // spin lock will take forever if the number of threads is much higher
     //do_all_tests(50); // spin lock will take forever if the number of threads is much higher
     //do_all_tests(1000); // spin lock will take forever if the number of threads is much higher
  
