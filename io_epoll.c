@@ -26,7 +26,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "stdalsp.h"
+//#include "stdalsp.h"
+#include "jlib.h"
 
 #define LISTEN_BACKLOG	256
 
@@ -174,7 +175,8 @@ int main(int argc, char *argv[])
 							if (-1 == (send_len = send(ep_events[i].data.fd, 
 								send_msg, strlen(send_msg), NULL)))
 							{
-								pr_err("send() error");
+								perror("send() error");
+								//pr_err("send() error");
 								exit(EXIT_FAILURE);
 							}	
 							pr_out("send(fd=%d,n=%d) = %.*s",

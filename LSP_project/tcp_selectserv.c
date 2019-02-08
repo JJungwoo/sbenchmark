@@ -102,7 +102,6 @@ int main(int argc, char *argv[])
 		//puts("?\n");
 	}
 
-
 	close(clnt_sock);
 	close(serv_sock);
 	

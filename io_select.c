@@ -4,7 +4,8 @@
  * Author      : SunYoung Kim <sunyzero@yahoo.com>
  * Notes       : 
  */
-#include "stdalsp.h"
+//#include "stdalsp.h"
+#include "jlib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/select.h>
@@ -163,7 +164,8 @@ int main(int argc, char *argv[])
 						/* normal */
 						pr_out("recv(fd=%d,n=%d) = %.*s", 
 								fd_socket[i], ret_recv, ret_recv, buf);
-						if (-1 == (send_len =  send(fd_socket[i], send_msg, strlen(send_msg), NULL)))
+						if (-1 == (send_len =  send(fd_socket[i], 
+								send_msg, strlen(send_msg), NULL)))
 						{	
 							pr_err("send() error");
 							exit(EXIT_FAILURE);

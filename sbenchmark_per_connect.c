@@ -25,10 +25,10 @@
 
 #define MESSAGE "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDD" // 40B + '\0' = 41B
 //#define OK_MSG "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEEFFFFFFFFFFGGGG" // 64B
-#define OK_MSG "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\ 
-AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\ 
-AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\ 
-AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\ 
+#define OK_MSG "AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
+AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
+AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
+AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
 AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
 AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
 AAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDDDEEEEEEEEEE\
@@ -95,8 +95,11 @@ int main(int argc, char *argv[])
 	} 
 	
 	if (4 > argc) {
-		pr_err("\n--------------------------------------\n input value is bad command line format \n \
-sbenchmark help command is \"--h\"\n--------------------------------------");
+		pr_err("\n\
+--------------------------------------	\n \
+input value is bad command line format	\n \
+sbenchmark help command is \"--h\"		\n \
+--------------------------------------");
 		exit(EXIT_FAILURE);
 	}
 	else
@@ -113,9 +116,9 @@ sbenchmark help command is \"--h\"\n--------------------------------------");
 		{	
 			if (0 < argv[4])	// thread counter error check
 			{
-				if (!strcmp("-f", argv[5]))
+				if (5 < argc && !strcmp("-f", argv[5]))
 					if (0 < argv[6])
-						file_size=argv[6];	// 1 (Per/Kilobyte)	
+						file_size=(int)atoi(argv[6]);	// 1 (Per/Kilobyte)	
 								
 				th_count = atoi(argv[4]);
 				
@@ -219,28 +222,32 @@ void *client_thread(void *data)
 	else
 		printf("(%d) socket connected... \n", sock);
 #endif
-	
+
+	if (0 != file_size) 
+	{	
 	//for (i=0; i<file_size*KSIZE ; i++)
 	//{
 		if (-1 == (send_len = send(sock, send_msg, BUF_SIZE, 0)))
 			error_handling("send() error");
 	//}
-	if (-1 == (recv_len = recv(sock, recv_msg, BUF_SIZE, 0)))
-		error_handling("recv() error");
-	if (!strcmp("success",recv_msg))
-	{
-		//ret_t.checksum = 1;
-		send_len = 0;
-		memset(send_msg, 0, BUF_SIZE);
-		memcpy(send_msg, EXIT_MESSAGE, BUF_SIZE);
-		if (-1 == (send_len = send(sock, send_msg, BUF_SIZE, 0)))
-			error_handling("send() error");
-		close(sock);
-	}
+		if (-1 == (recv_len = recv(sock, recv_msg, BUF_SIZE, 0)))
+			error_handling("recv() error");
+		if (!strcmp("success",recv_msg))
+		{
+			//ret_t.checksum = 1;
+			send_len = 0;
+			memset(send_msg, 0, BUF_SIZE);
+			memcpy(send_msg, EXIT_MESSAGE, BUF_SIZE);
+			if (-1 == (send_len = send(sock, send_msg, BUF_SIZE, 0)))
+				error_handling("send() error");
+			close(sock);
+		}
 #ifdef JDBG
-	pr_out("recv (fd=%d,n=%d) = %.*s",
-			sock, recv_len, recv_len, recv_msg); 
+		pr_out("recv (fd=%d,n=%d) = %.*s",
+				sock, recv_len, recv_len, recv_msg); 
 #endif
+	} else 
+		close(sock);
 
 	clock_gettime(CLOCK_REALTIME, &end_ts);	
 
