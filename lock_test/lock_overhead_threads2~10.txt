@@ -1,0 +1,46 @@
+*************************************
+        normal  2 threads took         30789941 nanoseconds, global counter = 5528751
+        atomic  2 threads took        174151604 nanoseconds, global counter = 10000000
+         mutex  2 threads took        722638156 nanoseconds, global counter = 10000000
+     semaphore  2 threads took        911089846 nanoseconds, global counter = 10000000
+      spinlock  2 threads took        226573872 nanoseconds, global counter = 10000000
+     read_lock  2 threads took        800157700 nanoseconds, global counter = 9808691
+    write_lock  2 threads took       1781152835 nanoseconds, global counter = 10000000
+*************************************
+*************************************
+        normal  4 threads took         68689741 nanoseconds, global counter = 6277199
+        atomic  4 threads took        358727085 nanoseconds, global counter = 20000000
+         mutex  4 threads took        963104855 nanoseconds, global counter = 20000000
+     semaphore  4 threads took       2949124513 nanoseconds, global counter = 20000000
+      spinlock  4 threads took        885643632 nanoseconds, global counter = 20000000
+     read_lock  4 threads took       1625097859 nanoseconds, global counter = 19750842
+    write_lock  4 threads took       4539119860 nanoseconds, global counter = 20000000
+*************************************
+*************************************
+        normal  6 threads took        111656428 nanoseconds, global counter = 7816734
+        atomic  6 threads took        542247662 nanoseconds, global counter = 30000000
+         mutex  6 threads took       1743340152 nanoseconds, global counter = 30000000
+     semaphore  6 threads took       4702819906 nanoseconds, global counter = 30000000
+      spinlock  6 threads took       1786997701 nanoseconds, global counter = 30000000
+     read_lock  6 threads took       2740124673 nanoseconds, global counter = 29463091
+    write_lock  6 threads took       9327684713 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+        normal  8 threads took        145092137 nanoseconds, global counter = 10762388
+        atomic  8 threads took        722241883 nanoseconds, global counter = 40000000
+         mutex  8 threads took       2269480552 nanoseconds, global counter = 40000000
+     semaphore  8 threads took       6920739395 nanoseconds, global counter = 40000000
+      spinlock  8 threads took       2765618378 nanoseconds, global counter = 40000000
+     read_lock  8 threads took       3269844360 nanoseconds, global counter = 39357052
+    write_lock  8 threads took      15123162339 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+        normal 10 threads took        182989296 nanoseconds, global counter = 11225787
+        atomic 10 threads took        904245110 nanoseconds, global counter = 50000000
+         mutex 10 threads took       2790865903 nanoseconds, global counter = 50000000
+     semaphore 10 threads took       9046897819 nanoseconds, global counter = 50000000
+      spinlock 10 threads took       4591624408 nanoseconds, global counter = 50000000
+     read_lock 10 threads took       4002897870 nanoseconds, global counter = 49201606
+    write_lock 10 threads took      20406598751 nanoseconds, global counter = 50000000
+*************************************
+*************************************

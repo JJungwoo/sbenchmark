@@ -1,0 +1,77 @@
+*************************************
+      spinlock  6 threads took       1788564116 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  6 threads took       1738863783 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  8 threads took       2957765179 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+      spinlock  6 threads took       1707778484 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  8 threads took       3167066355 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+      spinlock  6 threads took       1705826141 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  8 threads took       3081012529 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+      spinlock  6 threads took       1737909305 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  8 threads took       2838947334 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+      spinlock  6 threads took       1769277719 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock  8 threads took       2972268428 nanoseconds, global counter = 40000000
+*************************************
+*************************************
+before kind of 5, count: 2,       8659655432 nanoseconds 
+before kind of 5, count: 3,      15017059825 nanoseconds 
+*************************************
+kind of 5, count: 2,       1731931086 nanoseconds 
+kind of 5, count: 3,       3003411965 nanoseconds 
+*************************************
+*************************************
+      spinlock  6 threads took       1916668400 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock 12 threads took       7078703283 nanoseconds, global counter = 60000000
+*************************************
+*************************************
+      spinlock  6 threads took       1809939673 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock 12 threads took       6894566575 nanoseconds, global counter = 60000000
+*************************************
+*************************************
+      spinlock  6 threads took       1857278710 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock 12 threads took       7248093062 nanoseconds, global counter = 60000000
+*************************************
+*************************************
+      spinlock  6 threads took       1874538082 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock 12 threads took       6668150897 nanoseconds, global counter = 60000000
+*************************************
+*************************************
+      spinlock  6 threads took       1882935228 nanoseconds, global counter = 30000000
+*************************************
+*************************************
+      spinlock 12 threads took       6817546956 nanoseconds, global counter = 60000000
+*************************************
+*************************************
+before kind of 5, count: 2,       9341360093 nanoseconds 
+before kind of 5, count: 3,      34707060773 nanoseconds 
+*************************************
+kind of 5, count: 2,       1868272018 nanoseconds 
+kind of 5, count: 3,       6941412154 nanoseconds 
+*************************************

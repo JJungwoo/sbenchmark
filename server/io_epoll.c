@@ -58,6 +58,9 @@ int main(int argc, char *argv[])
     /* logical var 			*/
     int		i;
 
+    struct addrinfo ai, *ai_ret;
+    int     rc_gai;
+
     if (argc > 2) {
         printf("%s [port number]\n", argv[0]);
         exit(EXIT_FAILURE);
@@ -70,8 +73,6 @@ int main(int argc, char *argv[])
 	// JJ
 	memcpy(send_msg, SMESSAGE, strlen(SMESSAGE)+1);
 
-    struct addrinfo ai, *ai_ret;
-    int     rc_gai;
     memset(&ai, 0, sizeof(ai));
     ai.ai_family = AF_INET;
     ai.ai_socktype = SOCK_STREAM;

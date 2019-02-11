@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 		clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_adr, &adr_sz);
 		if (-1 == clnt_sock)
 		{
-			puts("accept() error!");
+			perror("accept() error!");
 			continue;
 		}
 		else 

@@ -13,9 +13,14 @@ struct timespec diff_timespec(struct timespec start, struct timespec end);
 long long nanosec_elapsed(struct timespec diff);
  
 // change this to make the run time short or longer
-#define WORK_PER_TEST 5000000
+#define WORK_PER_TEST 50
+//#define WORK_PER_TEST 5000000
 //#define WORK_PER_TEST 500000000
- 
+
+#define CONDITION_KIND_COUNT 8
+#define THREAD_COUNT 6 
+#define LOOP 1
+
 // global variable will be incremented from many threads
 unsigned long counter = 0;
  
@@ -24,6 +29,8 @@ pthread_rwlock_t rwlock;
 pthread_spinlock_t spinlock;
 typedef void* thread_func_t(void*);
 static sem_t sem_one;
+
+static long long elapsed_time_array[CONDITION_KIND_COUNT][THREAD_COUNT];
 
 void* normal(void *arg){
 	int i;
@@ -66,8 +73,12 @@ void* atomic(void* arg){
  
 void* mutexfunc(void* arg){
     int i;
+	pthread_t tid;
+	//tid = pthread_self();
+	//printf("mutex\n");
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_mutex_lock(&mutex);
+		//printf("%d: %d\n", tid,counter);
         counter++;
         pthread_mutex_unlock(&mutex);
     }
@@ -75,8 +86,12 @@ void* mutexfunc(void* arg){
  
 void* spin(void* arg){
     int i;
+	pthread_t tid;
+	tid = pthread_self();
+	//printf("spinlock\n");
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_spin_lock(&spinlock);
+		//printf("%d: %d\n", tid,counter);
         counter++;
         pthread_spin_unlock(&spinlock);
     }
@@ -84,8 +99,12 @@ void* spin(void* arg){
  
 void* read_lock(void* arg){
     int i;
+	pthread_t tid;
+	tid = pthread_self();
+	printf("read_lock\n");
     for (i = 0 ; i < WORK_PER_TEST; ++i) {
         pthread_rwlock_rdlock(&rwlock);
+		printf("tid(%d) : %d\n", tid,counter);
         counter++;
         pthread_rwlock_unlock(&rwlock);
     }
@@ -100,7 +119,7 @@ void* write_lock(void* arg){
     }
 }
  
-void do_test(thread_func_t func, unsigned short threads, const char* name){
+void do_test(thread_func_t func, unsigned short threads, const char* name, int k, int count){
     int i;
     struct timespec start;
     struct timespec end;
@@ -126,41 +145,74 @@ void do_test(thread_func_t func, unsigned short threads, const char* name){
     clock_gettime(CLOCK_MONOTONIC, &end);
     diff = diff_timespec(start, end);
     printf("%14s %2d threads took %16lld nanoseconds, global counter = %lu\n", name, threads, nanosec_elapsed(diff), counter);
+	elapsed_time_array[k][count] += nanosec_elapsed(diff);
 }
  
-void do_all_tests(int threads){
+void do_all_tests(int threads, int count){
     printf("*************************************\n");
     fflush(stdout);
-	do_test(&normal, threads, "normal");
+	//do_test(&normal, threads, "normal", 0, count);
 	//do_test(&CAS, threads, "CompareAndSet");
-    do_test(&atomic, threads, "atomic");
-    do_test(&mutexfunc, threads, "mutex");
-	do_test(&semaphore, threads, "semaphore");
-    do_test(&spin, threads, "spin");
-    do_test(&read_lock, threads, "read_lock");
-	do_test(&write_lock, threads, "write_lock");
+    //do_test(&atomic, threads, "atomic", 2, count);
+    //do_test(&mutexfunc, threads, "mutex", 3, count);
+	//do_test(&semaphore, threads, "semaphore", 4, count);
+	//printf("!!!!!spinlock deadlock risk!!!!!\n");
+    //do_test(&spin, threads, "spinlock", 5, count);
+    do_test(&read_lock, threads, "read_lock", 6, count);
+	//do_test(&write_lock, threads, "write_lock", 7, count);
     printf("*************************************\n");
     fflush(stdout);
 }
  
 int main(int argc, char** argv)
 {
-	int i;
+	int z ,i, j;
     pthread_mutex_init(&mutex, NULL);
     pthread_rwlock_init(&rwlock, NULL);
     pthread_spin_init(&spinlock, 0);
 	sem_init(&sem_one, 0, 1);
 
-for(i=0;i<5;i++){ 
-    do_all_tests(2);
-	do_all_tests(4);
-	do_all_tests(6);
-}
-    //do_all_tests(8);
-    //do_all_tests(32); // spin lock will take forever if the number of threads is much higher
+	for(z=0 ;z<LOOP ;z++){ 
+		//do_all_tests(2, 0);
+		//do_all_tests(4, 1);
+		//do_all_tests(6, 2);
+		//do_all_tests(8, 3);
+		do_all_tests(10, 4);
+		do_all_tests(12, 5);
+	}
+
+    //do_all_tests(2,0);
+    //do_all_tests(8,1);
+    //do_all_tests(32,2); // spin lock will take forever if the number of threads is much higher
     //do_all_tests(50); // spin lock will take forever if the number of threads is much higher
     //do_all_tests(1000); // spin lock will take forever if the number of threads is much higher
  
+    printf("*************************************\n");
+
+	for(i=0; i<CONDITION_KIND_COUNT; i++)
+	{
+		for(j=0; j<THREAD_COUNT; j++)
+		{	
+			if(0 != elapsed_time_array[i][j]) {
+				printf("before kind of %d, count: %d, %16lld nanoseconds \n", i, j, elapsed_time_array[i][j]);
+			}
+		}
+	}
+
+    printf("*************************************\n");
+
+	for(i=0; i<CONDITION_KIND_COUNT; i++)
+	{
+		for(j=0; j<THREAD_COUNT; j++)
+		{	
+			if(0 != elapsed_time_array[i][j]) {
+				elapsed_time_array[i][j] /= LOOP;
+				printf("kind of %d, count: %d, %16lld nanoseconds \n", i, j, elapsed_time_array[i][j]);
+			}
+		}
+
+	} 
+    printf("*************************************\n");
     pthread_mutex_destroy(&mutex);
     pthread_rwlock_destroy(&rwlock);
     pthread_spin_destroy(&spinlock);
